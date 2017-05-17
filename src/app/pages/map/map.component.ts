@@ -18,7 +18,7 @@ public map:any;
 
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYW5pbHBhdGh1cmkiLCJhIjoiY2oybDhmcWF0MDAwMDJxcWtzMDgwZWI3cyJ9.hzryXsu_ec_AafR-QzzVUQ', {
-      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+      attribution: '<a href="http://openstreetmap.org">Open Street Map</a>',
       maxZoom: 18,
       accessToken: 'pk.eyJ1IjoiYW5pbHBhdGh1cmkiLCJhIjoiY2oybDhmcWF0MDAwMDJxcWtzMDgwZWI3cyJ9.hzryXsu_ec_AafR-QzzVUQ',
        id: 'mapbox.light',
@@ -34,7 +34,22 @@ public map:any;
 		this.mapservice.getMapData()
 		.subscribe(
 			data => {
-				L.geoJSON(data.json()).addTo(this.map);
+        let key;
+
+        let right = L.icon({
+            iconUrl: "assets/images/right.png",
+            iconRetinaUrl: "assets/images/right.png",
+            iconSize: [29, 24],
+            iconAnchor: [9, 21],
+            popupAnchor: [0, -14]
+        });
+        for (key in data) {
+            if (data.hasOwnProperty(key)) {
+                L.marker( [data[key].lat, data[key].lon],{icon: right} )
+                        .bindPopup( data[key].county )
+                        .addTo( this.map );
+            }
+        }
 			},
 			error => {
         console.log(error)
