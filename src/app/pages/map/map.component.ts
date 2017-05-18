@@ -9,6 +9,7 @@ import * as L from 'leaflet';
 })
 export class MapComponent implements OnInit {
 public map:any;
+public seedsData: any = [];
   constructor(public mapservice:MapserviceService) { }
 
   ngOnInit() {
@@ -24,11 +25,22 @@ public map:any;
        id: 'mapbox.light',
     }).addTo(this.map)
     
-    this.getMapData();
+    this.getSeedsData();
 
   }
 
-
+getSeedsData(){
+  this.mapservice.getSeedsData()
+		.subscribe(
+			data => {
+        this.seedsData = data;
+        this.getMapData();
+			},
+			error => {
+        console.log(error)
+			}
+		);
+}
 
 	getMapData(){
 		this.mapservice.getMapData()
@@ -36,18 +48,36 @@ public map:any;
 			data => {
         let key;
 
-        let right = L.icon({
+        let rightIcon = L.icon({
             iconUrl: "assets/images/right.png",
             iconRetinaUrl: "assets/images/right.png",
             iconSize: [29, 24],
             iconAnchor: [9, 21],
             popupAnchor: [0, -14]
         });
+        let leftIcon = L.icon({
+            iconUrl: "assets/images/left.png",
+            iconRetinaUrl: "assets/images/left.png",
+            iconSize: [29, 24],
+            iconAnchor: [9, 21],
+            popupAnchor: [0, -14]
+        });
+
         for (key in data) {
             if (data.hasOwnProperty(key)) {
-                L.marker( [data[key].lat, data[key].lon],{icon: right} )
+              let selectedSeed =  this.seedsData[key] || {}; 
+              let myIcon = rightIcon;
+              if(selectedSeed.fips == key){
+                if(selectedSeed && selectedSeed.change > 0){
+                  myIcon = rightIcon;
+                }
+                else{
+                    myIcon = leftIcon;                
+                }
+                L.marker( [data[key].lat, data[key].lon],{icon: myIcon} )
                         .bindPopup( data[key].county )
                         .addTo( this.map );
+              }
             }
         }
 			},
@@ -57,9 +87,7 @@ public map:any;
 		);
 	}
 
-  getColor(d) {
-    
-}
+ 
 
 style(feature) {
   console.log(this);

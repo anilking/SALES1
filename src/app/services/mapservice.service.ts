@@ -17,4 +17,9 @@ export class MapserviceService {
                       .map((res:any) => res.json());
 	}
 
+  getSeedsData(){
+		return this.http.get('assets/seedsdata.json')
+                      .map((res:any) => res.json());
+	}
+
 }
